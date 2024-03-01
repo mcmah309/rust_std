@@ -2,10 +2,11 @@ import 'package:path/path.dart' as p;
 import 'package:rust_std/option.dart';
 import 'package:universal_io/io.dart';
 
-extension type Path._(String path) implements Object {
-    static final RegExp osAgnosticPathSep = RegExp(r'[\/\\]');
+import 'utils.dart';
 
-    Path(this.path): assert((path.contains("/") && !path.contains("\\")) || (!path.contains("/") && path.contains("\\") || (!path.contains("/") && !path.contains("\\"))), "Path must be either posix or windows style");
+extension type Path._(String path) implements Object {
+
+    Path(this.path): assert(!path.contains("\\"), "Path must be either posix style");
 // ancestors
     // Iterable<Path> ancestors() sync* {
     //     var current = this;
@@ -34,7 +35,7 @@ String fileName() => p.basename(path);
 /// The entire file name if the file name begins with . and has no other .s within;
 /// The portion of the file name before the second . if the file name begins with .
 Option<String> filePrefix() {
-    if(path.endsWith("/") || path.endsWith("\\")){
+    if(path.endsWith("/")){
         return None();
     }
     if(!path.contains(".")){
@@ -60,7 +61,7 @@ Option<String> filePrefix() {
 /// The entire file name if the file name begins with . and has no other .s within;
 /// Otherwise, the portion of the file name before the final .
 Option<String> fileStem() {
-    if(path.endsWith("/") || path.endsWith("\\")){
+    if(path.endsWith("/")){
         return None();
     }
     if(!path.contains(".")){
@@ -91,17 +92,17 @@ Option<String> fileStem() {
 // metadata
 // new : will not be implemented
 Option<Path> parent() {
-    if(!path.contains(osAgnosticPathSep)){
+    if(!path.contains("/")){
         return None();
     }
     int index;
-    if(path.endsWith("/") || path.endsWith("\\")){
+    if(path.endsWith("/")){
         index = 2;
     }
     else {
         index = 1;
     }
-    final splits = _splitWithoutRemoving(osAgnosticPathSep, path);
+    final splits = splitWithoutRemoving("/", path);
     final end = splits.length - index;
     if(end == 0){
         return None();
@@ -123,26 +124,3 @@ Option<Path> parent() {
 // AsRef<OsStr>
 // AsRef<Path>
 }
-
-  /// Does a [split] but instead of remove the matches that it is split on, the matches are included. Ex:
-  /// ```dart
-  /// String string = " word  word word ";
-  //  List<String> splits = string.splitWithoutRemoving(" ");
-  //  expect(splits, [" ", "word", " ", " ", "word", " ", "word", " "]);
-  /// ```
-  List<String> _splitWithoutRemoving(Pattern pattern, String string) {
-    Iterable<Match> matches = pattern.allMatches(string);
-    List<String> splits = [];
-    int lastEnd = 0;
-    for (final match in matches) {
-      if (lastEnd != match.start) {
-        splits.add(string.substring(lastEnd, match.start));
-      }
-      splits.add(string.substring(match.start, match.end));
-      lastEnd = match.end;
-    }
-    if (lastEnd != string.length) {
-      splits.add(string.substring(lastEnd));
-    }
-    return splits;
-  }
