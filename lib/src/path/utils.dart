@@ -1,22 +1,31 @@
-  /// Does a [split] but instead of remove the matches that it is split on, the matches are included. Ex:
-  /// ```dart
-  /// String string = " word  word word ";
-  //  List<String> splits = string.splitWithoutRemoving(" ");
-  //  expect(splits, [" ", "word", " ", " ", "word", " ", "word", " "]);
-  /// ```
-  List<String> splitWithoutRemoving(Pattern pattern, String string) {
-    Iterable<Match> matches = pattern.allMatches(string);
-    List<String> splits = [];
-    int lastEnd = 0;
-    for (final match in matches) {
-      if (lastEnd != match.start) {
-        splits.add(string.substring(lastEnd, match.start));
+void forEachExceptFirstAndLast<E>(Iterator<E> iterator,
+    {required Function(E)? doFirst,
+    required Function(E)? doRest,
+    required Function(E)? doLast,
+    required Function(E)? doIfOnlyOne,
+    required Function()? doIfEmpty}) {
+  if (iterator.moveNext()) {
+      E current = iterator.current;
+      if (iterator.moveNext()) {
+        doFirst?.call(current);
+        current = iterator.current;
+        if (iterator.moveNext()) {
+          E next = iterator.current;
+          while (iterator.moveNext()) {
+            doRest?.call(current);
+            current = next;
+            next = iterator.current;
+          }
+          doRest?.call(current);
+          doLast?.call(next);
+        } else {
+          doLast?.call(current);
+        }
+      } else {
+        doIfOnlyOne?.call(current);
       }
-      splits.add(string.substring(match.start, match.end));
-      lastEnd = match.end;
     }
-    if (lastEnd != string.length) {
-      splits.add(string.substring(lastEnd));
-    }
-    return splits;
+  else {
+    doIfEmpty?.call();
   }
+}

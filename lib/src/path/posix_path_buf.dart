@@ -1,6 +1,7 @@
 
+part of 'posix_path.dart';
 
-extension type PathBuf(List<String> path){
+extension type PathBuf(List<Path> path){
 
 
 }

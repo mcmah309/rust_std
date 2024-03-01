@@ -4,34 +4,72 @@ import 'package:rust_std/posix_path.dart';
 
 void main() {
   test("filePrefix", () {
-    expect("foo", Path("foo.rs").filePrefix().unwrap());
-    expect(true, Path("foo/").filePrefix().isNone());
-    expect(".foo", Path(".foo").filePrefix().unwrap());
-    expect("foo", Path(".foo.rs").filePrefix().unwrap());
-    expect("foo", Path("foo").filePrefix().unwrap());
-    expect("foo", Path("foo.tar.gz").filePrefix().unwrap());
-    expect("foo", Path("temp/foo.tar.gz").filePrefix().unwrap());
+    expect(Path("foo.rs").filePrefix().unwrap(), "foo");
+    expect(Path("foo/").filePrefix().unwrap(), "foo");
+    expect(Path(".foo").filePrefix().unwrap(), ".foo");
+    expect(Path(".foo.rs").filePrefix().unwrap(), "foo");
+    expect(Path("foo").filePrefix().unwrap(), "foo");
+    expect(Path("foo.tar.gz").filePrefix().unwrap(), "foo");
+    expect(Path("temp/foo.tar.gz").filePrefix().unwrap(), "foo");
   });
 
   test("fileStem", () {
-    expect("foo", Path("foo.rs").fileStem().unwrap());
-    expect(true, Path("foo/").fileStem().isNone());
-    expect(".foo", Path(".foo").fileStem().unwrap());
-    expect("foo", Path(".foo.rs").fileStem().unwrap());
-    expect("foo", Path("foo").fileStem().unwrap());
-    expect("foo.tar", Path("foo.tar.gz").fileStem().unwrap());
-    expect("foo.tar", Path("temp/foo.tar.gz").fileStem().unwrap());
+    expect(Path("foo.rs").fileStem().unwrap(), "foo");
+    expect(Path("foo/").filePrefix().unwrap(), "foo");
+    expect(Path(".foo").fileStem().unwrap(), ".foo");
+    expect(Path(".foo.rs").fileStem().unwrap(), "foo");
+    expect(Path("foo").fileStem().unwrap(), "foo");
+    expect(Path("foo.tar.gz").fileStem().unwrap(), "foo.tar");
+    expect(Path("temp/foo.tar.gz").fileStem().unwrap(), "foo.tar");
   });
 
   test("parent", () {
-    expect(Path("temp/"), Path("temp/foo.rs").parent().unwrap());
-    expect(true, Path("foo/").parent().isNone());
-    expect(Path("/"), Path("/foo/").parent().unwrap());
-    expect(true, Path(".foo").parent().isNone());
-    expect(true, Path(".foo.rs").parent().isNone());
-    expect(true, Path("foo").parent().isNone());
-    expect(true, Path("foo.tar.gz").parent().isNone());
-    expect(Path("temp/"), Path("temp/foo.tar.gz").parent().unwrap());
-    expect(Path("temp1/temp2/"), Path("temp1/temp2/foo.tar.gz").parent().unwrap());
+    expect(Path("temp/foo.rs").parent().unwrap(), Path("temp"));
+    expect(Path("foo/").parent().unwrap(), Path(""));
+    expect(Path("/foo/").parent().unwrap(), Path("/"));
+    expect(Path(".foo").parent().unwrap(), Path(""));
+    expect(Path(".foo.rs").parent().unwrap(), Path(""));
+    expect(Path("foo").parent().unwrap(), Path(""));
+    expect(Path("foo.tar.gz").parent().unwrap(), Path(""));
+    expect(Path("temp/foo.tar.gz").parent().unwrap(), Path("temp"));
+    expect(Path("temp1/temp2/foo.tar.gz").parent().unwrap(), Path("temp1/temp2"));
+    expect(Path("temp1/temp2//foo.tar.gz").parent().unwrap(), Path("temp1/temp2"));
+  });
+
+  test("ancestors", () {
+    var ancestors = Path("/foo/bar").ancestors().iterator;
+    ancestors.moveNext();
+    expect(ancestors.current, Path("/foo/bar"));
+    ancestors.moveNext();
+    expect(ancestors.current, Path("/foo"));
+    ancestors.moveNext();
+    expect(ancestors.current, Path("/"));
+    expect(ancestors.moveNext(), false);
+
+    ancestors = Path("../foo/bar").ancestors().iterator;
+    ancestors.moveNext();
+    expect(ancestors.current, Path("../foo/bar"));
+    ancestors.moveNext();
+    expect(ancestors.current, Path("../foo"));
+    ancestors.moveNext();
+    expect(ancestors.current, Path(".."));
+    ancestors.moveNext();
+    expect(ancestors.current, Path(""));
+    expect(ancestors.moveNext(), false);
+
+    ancestors = Path("foo/bar").ancestors().iterator;
+    ancestors.moveNext();
+    expect(ancestors.current, Path("foo/bar"));
+    ancestors.moveNext();
+    expect(ancestors.current, Path("foo"));
+    ancestors.moveNext();
+    expect(ancestors.current, Path(""));
+    expect(ancestors.moveNext(), false);
+
+    ancestors = Path("foo/..").ancestors().iterator;
+    ancestors.moveNext();
+    expect(ancestors.current, Path("foo/.."));
+    ancestors.moveNext();
+    expect(ancestors.current, Path("foo"));
   });
 }
