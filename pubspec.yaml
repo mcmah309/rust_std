@@ -4,12 +4,13 @@ version: 0.0.1
 repository: https://github.com/mcmah309/rust_std
 
 environment:
-  sdk: ^3.2.0
+  sdk: ^3.3.0
 
 # Add regular dependencies here.
 dependencies:
   rust_core: ^0.3.6
-  # path: ^1.8.0
+  path: ^1.9.0
+  universal_io: ^2.2.2
 
 dev_dependencies:
   lints: ^2.1.0
