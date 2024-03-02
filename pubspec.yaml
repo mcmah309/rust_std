@@ -8,7 +8,10 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  rust_core: ^0.3.6
+  rust_core:
+    git:
+      url: https://github.com/mcmah309/rust_core.git
+      ref: iterator
   path: ^1.9.0
   universal_io: ^2.2.2
 
