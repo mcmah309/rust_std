@@ -2,9 +2,9 @@ import 'package:rust_std/slice.dart';
 import 'package:rust_std/iter.dart';
 import 'package:rust_std/option.dart';
 
-extension type Vec<T extends Object>._(List<T?> list) {
+extension type Vec<T extends Object>._(List<T> list) {
 
-  Vec(List<T> this.list);
+  Vec(this.list);
 
 // allocator: will not be implemented
 
@@ -18,7 +18,7 @@ extension type Vec<T extends Object>._(List<T?> list) {
 // as_ptr: will not be implemented
 
   /// Returns a slice of the Vec from the start index to the end index.
-  Slice<T> asSlice() => Slice(toList(), 0, list.length);
+  Slice<T> asSlice() => Slice.fromList(list);
 
 // capacity: will not be implemented, not possible
 
@@ -31,7 +31,7 @@ extension type Vec<T extends Object>._(List<T?> list) {
   void dedup() {
     late T last;
     bool first = true;
-    toList().removeWhere((element) {
+    list.removeWhere((element) {
       if (first) {
         last = element;
         first = false;
@@ -49,7 +49,7 @@ extension type Vec<T extends Object>._(List<T?> list) {
   void dedupBy(bool Function(T a, T b) f) {
     late T last;
     bool first = true;
-    toList().removeWhere((element) {
+    list.removeWhere((element) {
       if (first) {
         last = element;
         first = false;
@@ -67,7 +67,7 @@ extension type Vec<T extends Object>._(List<T?> list) {
   void dedupByKey<K>(K Function(T) f) {
     late K last;
     bool first = true;
-    toList().removeWhere((element) {
+    list.removeWhere((element) {
       if (first) {
         last = f(element);
         first = false;
@@ -82,15 +82,15 @@ extension type Vec<T extends Object>._(List<T?> list) {
   }
 
   /// Removes the element at the given index from the Vec and returns it.
-  Iterable<T> drain(int start, int end) {
-    final range = toList().getRange(start, end).toList(growable: false);
+  Iterable<T> drain(int start, int end) { //todo change to array
+    final range = list.getRange(start, end).toList(growable: false);
     list.removeRange(start, end);
     return range;
   }
 
   /// Appends all elements in a slice to the Vec.
   void extendFromSlice(Slice<T> slice) {
-    list.addAll(slice.list.iterable);
+    list.addAll(slice);
   }
 
   // Appends all the elements in range to the end of the vector.
@@ -127,7 +127,7 @@ extension type Vec<T extends Object>._(List<T?> list) {
     if (list.isEmpty) {
       return None();
     }
-    return Some(toList().removeLast());
+    return Some(list.removeLast());
   }
 
   /// Appends an element to the end of the Vec.
@@ -136,10 +136,10 @@ extension type Vec<T extends Object>._(List<T?> list) {
 // push_within_capacity: will not implement, no point
 
   /// Removes the element at the given index from the Vec. Will throw if out of bounds.
-  T remove(int index) => toList().removeAt(index);
+  T remove(int index) => list.removeAt(index);
 
-// reserve
-// reserve_exact
+// reserve: Will not implement, would require another param to keep track of allocation vs vec size
+// reserve_exact: Will not implement, not possible
 // resize
 // resize_with
 // retain
@@ -152,22 +152,17 @@ extension type Vec<T extends Object>._(List<T?> list) {
 // split_at_spare_mut
 // split_off
 // swap_remove
-// truncate
-// try_reserve
-// try_reserve_exact
 
-  /// Creates a new Vec with the specified capacity. //todo
-  //Vec.withCapacity(int capacity, T fill) : list = List<T>.filled(capacity, null);
-
-// with_capacity_in
-
-  //************************************************************************//
-
-  List<T> toList() {
-    return list as List<T>;
+  /// Shortens the vector, keeping the first len elements and dropping the rest.
+  void truncate(int newLen) {
+    list.length = newLen;
   }
 
+// try_reserve: Will not implement, would require another param to keep track of allocation vs vec size
+// try_reserve_exact: Will not implement, not possible
+// with_capacity_in: Will not implement, would require another param to keep track of allocation vs vec size
+
   //************************************************************************//
 
-  RIterator<T> iter() => RIterator(toList());
+  RIterator<T> iter() => RIterator(list);
 }
