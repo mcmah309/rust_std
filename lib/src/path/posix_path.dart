@@ -1,17 +1,26 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:path/path.dart' as p;
 import 'package:rust_std/option.dart';
-import 'package:universal_io/io.dart';
+import 'package:rust_std/iter.dart';
+import 'package:rust_std/result.dart';
+import 'package:rust_std/src/path/io_error.dart';
+import 'package:universal_io/io.dart' as io;
 
 import 'utils.dart';
 
 part 'posix_path_buf.dart';
 
-// A path separated by /
+/// An iterator over the entries within a directory.
+typedef ReadDir = List<io.FileSystemEntity>;
+typedef Metadata = io.FileStat;
+
+
 extension type Path._(String path) implements Object {
   static final RegExp regularPathComponent = RegExp(r'^[.\w-]+(\.[\w-]+)*$');
   static final RegExp oneOrmoreSlashes = RegExp(r'/+');
+  static final p.Context unix = p.Context(style: p.Style.posix);
 
   Path(this.path) : assert(_validate(path), "Path must be posix style");
 
@@ -27,7 +36,7 @@ extension type Path._(String path) implements Object {
 // as_mut_os_str : will not be implemented
 // as_os_str : will not be implemented
 
-  Path canonicalize() => Path(p.canonicalize(path));
+  Path canonicalize() => Path(unix.canonicalize(path));
 
   Iterable<Component> components() sync* {
     bool removeLast;
@@ -81,15 +90,21 @@ extension type Path._(String path) implements Object {
     }
   }
 
-// display
-// ends_with
+  /// String representation of the path
+  String display() => toString();
 
+  /// Determines whether other is a suffix of this.
+  bool endsWith(Path other) => path.endsWith(other.path);
+
+  /// Determines whether other is a suffix of this.
   bool exists() =>
-      FileSystemEntity.typeSync(path, followLinks: true) != FileSystemEntityType.notFound;
+      io.FileSystemEntity.typeSync(path, followLinks: true) != io.FileSystemEntityType.notFound;
 
-  String extension() => p.extension(path);
+  /// Extracts the extension (without the leading dot) of self.file_name, if possible.
+  String extension() => unix.extension(path);
 
-  String fileName() => p.basename(path);
+  /// Returns the final component of the Path, if there is one.
+  String fileName() => unix.basename(path);
 
   /// Extracts the portion of the file name before the first "." -
   ///
@@ -101,7 +116,7 @@ extension type Path._(String path) implements Object {
   Option<String> filePrefix() {
     final last = components().lastOrNull;
     if (last is! Normal) {
-      return None();
+      return None;
     }
     final value = last.value;
     if (!value.contains(".")) {
@@ -127,7 +142,7 @@ extension type Path._(String path) implements Object {
   /// Otherwise, the portion of the file name before the final .
   Option<String> fileStem() {
     if (path.endsWith("/")) {
-      return None();
+      return None;
     }
     if (!path.contains(".")) {
       return Some(path);
@@ -141,19 +156,37 @@ extension type Path._(String path) implements Object {
         return Some(splits[1]);
       }
     }
-    return Some(p.basenameWithoutExtension(path));
+    return Some(unix.basenameWithoutExtension(path));
   }
 
-// has_root
-// into_path_buf
-// is_absolute
-// is_dir
-// is_file
-// is_relative
-// is_symlink
-// iter
-// join
-// metadata
+  /// Returns true if the Path has a root.
+  bool hasRoot() => unix.rootPrefix(path) == "/";
+
+  // into_path_buf : will not be implemented, use `toPathBuf`
+
+  /// Returns true if the Path is absolute, i.e., if it is independent of the current directory.
+  bool isAbsolute() => unix.isAbsolute(path);
+
+  /// Returns true if the path exists on disk and is pointing at a directory. Does not follow links.
+  bool isDir() => io.FileSystemEntity.isDirectorySync(path);
+
+  /// Returns true if the path exists on disk and is pointing at a regular file. Does not follow links.
+  bool isFile() => io.FileSystemEntity.isFileSync(path);
+
+  /// Returns true if the Path is relative, i.e., not absolute.
+  bool isRelative() => unix.isRelative(path);
+
+  /// Returns true if the path exists on disk and is pointing at a symlink. Does not follow links.
+  bool isSymlink() => io.FileSystemEntity.isLinkSync(path);
+
+  /// Produces an iterator over the path’s components viewed as Strings
+  RIterator<String> iter() => RIterator(components().map((e) => e.toString()));
+
+  Path join(Path other) => Path(unix.join(path, other.path));
+
+  /// Queries the file system to get information about a file, directory, etc.
+  Metadata metadata() => io.FileStat.statSync(path);
+
 // new : will not be implemented
 
   /// Returns the Path without its final component, if there is one.
@@ -165,7 +198,7 @@ extension type Path._(String path) implements Object {
       switch (comps.first) {
         case RootDir():
         case Prefix():
-          return None();
+          return None;
         case ParentDir():
         case CurDir():
         case Normal():
@@ -175,25 +208,85 @@ extension type Path._(String path) implements Object {
     if (comps.length > 1) {
       comps.removeLast();
     } else {
-      return None();
+      return None;
     }
     return Some(_joinComponents(comps));
   }
 
-// read_dir
-// read_link
-// starts_with
-// strip_prefix
-// symlink_metadata
-// to_path_buf
-// to_str
-// to_string_lossy
-// try_exists
-// with_extension
-// with_file_name
-// Trait Implementations
-// AsRef<OsStr>
-// AsRef<Path>
+  /// Returns an iterator over the entries within a directory.
+  Result<ReadDir, IoError> readDir() {
+    if (!isDir()) {
+      return Err(IoError(IoErrorType.notADirectory, path: this));
+    }
+    try {
+      final dir = io.Directory(path);
+      return Ok(dir.listSync());
+    } catch (e) {
+      return Err(IoError(IoErrorType.unknown, path: this, error: e));
+    }
+  }
+
+  /// Reads a symbolic link, returning the file that the link points to.
+  Result<PathBuf, IoError> readLink() {
+    if (!isSymlink()) {
+      return Err(IoError(IoErrorType.notAlink, path: this));
+    }
+    try {
+      final link = io.Link(path);
+      return Ok(PathBuf([Path(link.resolveSymbolicLinksSync())]));
+    } catch (e) {
+      return Err(IoError(IoErrorType.unknown, path: this, error: e));
+    }
+  }
+
+  /// Determines whether other is a prefix of this.
+  bool startsWith(Path other) => path.startsWith(other.path);
+
+  /// Returns a path that, when joined onto base, yields this. Returns None if [prefix] is not a subpath of base.
+  Option<Path> stripPrefix(Path prefix) {
+    if (!startsWith(prefix)) {
+      return None;
+    }
+    final newPath = path.substring(prefix.path.length);
+    return Some(Path(newPath));
+  }
+
+  Result<Metadata, IoError> symlinkMetadata() {
+    if (!isSymlink()) {
+      return Err(IoError(IoErrorType.notAlink, path: this));
+    }
+    try {
+      return Ok(io.Link(path).statSync());
+    }
+    catch(e){
+      return Err(IoError(IoErrorType.unknown, path: this, error: e));
+    }
+  }
+
+  /// Converts to [PathBuf]
+  PathBuf toPathBuf() => PathBuf([this]);
+
+// to_str: Implemented by type
+// to_string_lossy: Will not be implemented
+// try_exists: Will not implement
+
+  /// Creates an PathBuf like this but with the given extension.
+  PathBuf withExtension(String extension) {
+    final stem = fileStem().unwrapOr("");
+    if(extension.isEmpty){
+      return PathBuf([Path(stem)]);
+    }
+    return PathBuf([Path("$stem.$extension")]);
+  }
+
+  /// Creates an PathBuf like this but with the given file name.
+  PathBuf withFileName(String fileName){
+    final parentOption = parent();
+    return switch(parentOption){
+      None => PathBuf([Path(fileName)]),
+      Some(:final v) => PathBuf([v.join(Path(fileName))]),
+    };
+  }
 }
 
 Path _joinComponents(Iterable<Component> components) {
