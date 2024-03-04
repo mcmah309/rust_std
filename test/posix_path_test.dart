@@ -11,13 +11,14 @@ void main() {
     expect(Path("foo").filePrefix().unwrap(), "foo");
     expect(Path("foo.tar.gz").filePrefix().unwrap(), "foo");
     expect(Path("temp/foo.tar.gz").filePrefix().unwrap(), "foo");
+    expect(Path("/foo/.tmp.bar.tar").filePrefix().unwrap(), "tmp");
   });
 
   test("fileStem", () {
     expect(Path("foo.rs").fileStem().unwrap(), "foo");
     expect(Path("foo/").filePrefix().unwrap(), "foo");
     expect(Path(".foo").fileStem().unwrap(), ".foo");
-    expect(Path(".foo.rs").fileStem().unwrap(), "foo");
+    expect(Path(".foo.rs").fileStem().unwrap(), ".foo");
     expect(Path("foo").fileStem().unwrap(), "foo");
     expect(Path("foo.tar.gz").fileStem().unwrap(), "foo.tar");
     expect(Path("temp/foo.tar.gz").fileStem().unwrap(), "foo.tar");
@@ -72,4 +73,26 @@ void main() {
     ancestors.moveNext();
     expect(ancestors.current, Path("foo"));
   });
+
+  test("withExtension",(){
+    expect(Path("foo").withExtension("rs"), Path("foo.rs"));
+    expect(Path("foo.rs").withExtension("rs"), Path("foo.rs"));
+    expect(Path("foo.tar.gz").withExtension("rs"), Path("foo.tar.rs"));
+    expect(Path("foo.tar.gz").withExtension(""), Path("foo.tar"));
+    expect(Path("foo.tar.gz").withExtension("tar.gz"), Path("foo.tar.tar.gz"));
+    expect(Path("/tmp/foo.tar.gz").withExtension("tar.gz"), Path("/tmp/foo.tar.tar.gz"));
+    expect(Path("tmp/foo").withExtension("tar.gz"), Path("tmp/foo.tar.gz"));
+    expect(Path("tmp/.foo.tar").withExtension("tar.gz"), Path("tmp/.foo.tar.gz"));
+  });
+
+  test("withFileName",(){
+    expect(Path("foo").withFileName("bar"), Path("bar"));
+    expect(Path("foo.rs").withFileName("bar"), Path("bar"));
+    expect(Path("foo.tar.gz").withFileName("bar"), Path("bar"));
+    expect(Path("/tmp/foo.tar.gz").withFileName("bar"), Path("/tmp/bar"));
+    expect(Path("tmp/foo").withFileName("bar"), Path("tmp/bar"));
+    expect(Path("/var").withFileName("bar"), Path("/bar"));
+  });
+
+
 }

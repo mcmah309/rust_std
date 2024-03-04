@@ -10,12 +10,9 @@ import 'package:universal_io/io.dart' as io;
 
 import 'utils.dart';
 
-part 'posix_path_buf.dart';
-
 /// An iterator over the entries within a directory.
 typedef ReadDir = List<io.FileSystemEntity>;
 typedef Metadata = io.FileStat;
-
 
 extension type Path._(String path) implements Object {
   static final RegExp regularPathComponent = RegExp(r'^[.\w-]+(\.[\w-]+)*$');
@@ -114,11 +111,7 @@ extension type Path._(String path) implements Object {
   /// The entire file name if the file name begins with . and has no other .s within;
   /// The portion of the file name before the second . if the file name begins with .
   Option<String> filePrefix() {
-    final last = components().lastOrNull;
-    if (last is! Normal) {
-      return None;
-    }
-    final value = last.value;
+    final value = p.basename(path);
     if (!value.contains(".")) {
       return Some(value);
     }
@@ -141,28 +134,17 @@ extension type Path._(String path) implements Object {
   /// The entire file name if the file name begins with . and has no other .s within;
   /// Otherwise, the portion of the file name before the final .
   Option<String> fileStem() {
-    if (path.endsWith("/")) {
+    final fileStem = unix.basenameWithoutExtension(path);
+    if(fileStem.isEmpty){
       return None;
     }
-    if (!path.contains(".")) {
-      return Some(path);
-    }
-    if (path.startsWith(".")) {
-      final splits = path.split(".");
-      if (splits.length == 2) {
-        return Some(path);
-      } else {
-        assert(splits.length > 2);
-        return Some(splits[1]);
-      }
-    }
-    return Some(unix.basenameWithoutExtension(path));
+    return Some(fileStem);
   }
 
   /// Returns true if the Path has a root.
   bool hasRoot() => unix.rootPrefix(path) == "/";
 
-  // into_path_buf : will not be implemented, use `toPathBuf`
+  // into_path_buf : will not be implemented
 
   /// Returns true if the Path is absolute, i.e., if it is independent of the current directory.
   bool isAbsolute() => unix.isAbsolute(path);
@@ -182,6 +164,7 @@ extension type Path._(String path) implements Object {
   /// Produces an iterator over the path’s components viewed as Strings
   RIterator<String> iter() => RIterator(components().map((e) => e.toString()));
 
+  /// Creates an Path with path adjoined to this.
   Path join(Path other) => Path(unix.join(path, other.path));
 
   /// Queries the file system to get information about a file, directory, etc.
@@ -227,13 +210,13 @@ extension type Path._(String path) implements Object {
   }
 
   /// Reads a symbolic link, returning the file that the link points to.
-  Result<PathBuf, IoError> readLink() {
+  Result<Path, IoError> readLink() {
     if (!isSymlink()) {
       return Err(IoError(IoErrorType.notAlink, path: this));
     }
     try {
       final link = io.Link(path);
-      return Ok(PathBuf([Path(link.resolveSymbolicLinksSync())]));
+      return Ok(Path(link.resolveSymbolicLinksSync()));
     } catch (e) {
       return Err(IoError(IoErrorType.unknown, path: this, error: e));
     }
@@ -257,34 +240,46 @@ extension type Path._(String path) implements Object {
     }
     try {
       return Ok(io.Link(path).statSync());
-    }
-    catch(e){
+    } catch (e) {
       return Err(IoError(IoErrorType.unknown, path: this, error: e));
     }
   }
 
-  /// Converts to [PathBuf]
-  PathBuf toPathBuf() => PathBuf([this]);
-
+// to_path_buf: Will not implement, implementing a PathBuf does not make sense at the present (equality cannot hold for extension types and a potential PathBuf would likely be `StringBuffer` or `List<String>`).
 // to_str: Implemented by type
 // to_string_lossy: Will not be implemented
 // try_exists: Will not implement
 
   /// Creates an PathBuf like this but with the given extension.
-  PathBuf withExtension(String extension) {
+  Path withExtension(String extension) {
     final stem = fileStem().unwrapOr("");
-    if(extension.isEmpty){
-      return PathBuf([Path(stem)]);
+    final parentOption = parent();
+    if (parentOption.isNone()) {
+      if (stem.isEmpty) {
+        return Path(extension);
+      } else {
+        if (extension.isEmpty) {
+          return Path(stem);
+        }
+        return Path("$stem.$extension");
+      }
     }
-    return PathBuf([Path("$stem.$extension")]);
+    if (stem.isEmpty) {
+      return parentOption.unwrap().join(Path(extension));
+    }
+    if (extension.isEmpty) {
+      return parentOption.unwrap().join(Path(stem));
+    }
+    return parentOption.unwrap().join(Path("$stem.$extension"));
   }
 
   /// Creates an PathBuf like this but with the given file name.
-  PathBuf withFileName(String fileName){
+  Path withFileName(String fileName) {
     final parentOption = parent();
-    return switch(parentOption){
-      None => PathBuf([Path(fileName)]),
-      Some(:final v) => PathBuf([v.join(Path(fileName))]),
+    return switch (parentOption) {
+      None => Path(fileName),
+      // ignore: pattern_never_matches_value_type
+      Some(:final v) => v.join(Path(fileName)),
     };
   }
 }
@@ -318,7 +313,7 @@ bool _validate(String path) {
   if (path.contains("\\")) {
     return false;
   }
-  if(RegExp(r'\.\.[^/]').hasMatch(path)){
+  if (RegExp(r'\.\.[^/]').hasMatch(path)) {
     return false;
   }
   return true;
