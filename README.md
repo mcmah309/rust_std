@@ -3,7 +3,7 @@ The rust standard library implemented in Dart where it makes sense.
 table of **Rust std** vs **Dart std** types
 | Rust Type         | Dart Equivalent | Implementation | Description                                             |
 |-------------------|-----------------|----------------------|---------------------------------------------------------|
-| `Vec<T>`          | `List<T>`       | `Vec<T>` 🚧                    | Dynamic array or list.                                  |
+| `Vec<T>`          | `List<T>`       | `Vec<T>` ✅                    | Dynamic array or list.                                  |
 | `[T]`             | `List.unmodifiable`| `Slice<T>` 🚧                    | immutable array or list.                                  |
 | `Iterator<T>`     | `Iterable<T>`   |  `RIterator<T>` 🚧                  | Composable iteration
 | `HashMap<K, V>`   | `Map<K, V>`     | `HashMap<K, V>` ❌                    | Key-value pairs collection, implemented as a hash table.|
