@@ -43,7 +43,7 @@ main() {
 
   test("drain", () {
     var vec = Vec([1, 2, 3, 4, 5]);
-    var drained = vec.drain(1, vec.len() - 1).toList();
+    var drained = vec.drain(1, vec.len() - 1);
     expect(drained, [2, 3, 4]);
     expect(vec, [1, 5]);
   });
@@ -115,7 +115,7 @@ main() {
 
   test("splice", () {
     var vec = Vec([1, 2, 3, 4]);
-    var spliced = vec.splice(1, 3, [7, 8, 9]).collectVec();
+    var spliced = vec.splice(1, 3, [7, 8, 9]);
     expect(vec, [1, 7, 8, 9, 4]);
     expect(spliced, [2, 3]);
   });

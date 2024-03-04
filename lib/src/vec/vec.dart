@@ -1,9 +1,9 @@
-import 'package:rust_std/prelude.dart';
 import 'package:rust_std/slice.dart';
 import 'package:rust_std/iter.dart';
 import 'package:rust_std/option.dart';
+import 'package:rust_std/vec.dart';
 
-extension type Vec<T>._(List<T> list) {
+extension type Vec<T>._(List<T> list) implements Iterable<T> {
   Vec(this.list);
 
   Iterator<T> get iterator => list.iterator;
@@ -88,11 +88,10 @@ extension type Vec<T>._(List<T> list) {
   }
 
   /// Removes the element at the given index from the Vec and returns it.
-  Iterable<T> drain(int start, int end) {
-    //todo change to array
+  Vec<T> drain(int start, int end) {
     final range = list.getRange(start, end).toList(growable: false);
     list.removeRange(start, end);
-    return range;
+    return Vec(range);
   }
 
   /// Appends all elements in a slice to the Vec.
@@ -118,8 +117,8 @@ extension type Vec<T>._(List<T> list) {
     list.insert(index, element);
   }
 
-// into_boxed_slice: will not implement, box is not a thing in dart
-// into_flattened: //todo add with an extension
+// into_boxed_slice: will not implement, box is not a thing in dart 
+// into_flattened: Added as extension
 // into_raw_parts: will not be implemented, not possible
 // into_raw_parts_with_alloc: will not be implemented, not possible
 
@@ -195,10 +194,13 @@ extension type Vec<T>._(List<T> list) {
 
   /// Creates a splicing iterator that replaces the specified range in the vector with the given
   /// [replaceWith] iterator and yields the removed items. replace_with does not need to be the same length as range.
-  RIterator<T> splice(int start, int end, Iterable<T> replaceWith) {
+  // Dev Note: For the real functionality, we would need to implement a custom iterator that removes the section, then
+  // adds items from [replaceWith] as it iterates over it, but this may end up being more computationally
+  // expensive than just doing it eagerly.
+  Vec<T> splice(int start, int end, Iterable<T> replaceWith) {
     final range = list.getRange(start, end).toList(growable: false);
     list.replaceRange(start, end, replaceWith);
-    return RIterator(range);
+    return Vec(range);
   }
 
 // split_at_spare_mut: Will not implement, not possible
