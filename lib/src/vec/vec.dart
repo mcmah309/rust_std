@@ -2,7 +2,7 @@ import 'package:rust_std/slice.dart';
 import 'package:rust_std/iter.dart';
 import 'package:rust_std/option.dart';
 
-extension type Vec<T extends Object>._(List<T> list) {
+extension type Vec<T>._(List<T> list) {
 
   Vec(this.list);
 
@@ -125,7 +125,7 @@ extension type Vec<T extends Object>._(List<T> list) {
   /// Removes the last element from the Vec and returns it, or None if it is empty.
   Option<T> pop() {
     if (list.isEmpty) {
-      return None();
+      return None;
     }
     return Some(list.removeLast());
   }
@@ -140,17 +140,68 @@ extension type Vec<T extends Object>._(List<T> list) {
 
 // reserve: Will not implement, would require another param to keep track of allocation vs vec size
 // reserve_exact: Will not implement, not possible
-// resize
-// resize_with
-// retain
-// retain_mut
-// set_len
-// shrink_to
-// shrink_to_fit
-// spare_capacity_mut
-// splice
-// split_at_spare_mut
-// split_off
+
+  /// Resizes the Vec in-place so that len is equal to [newLen].
+  /// If [newLen] is greater than len, the Vec is extended by the difference,
+  /// with each additional slot filled with value. If new_len is less than len,
+  /// the Vec is simply truncated.
+  void resize(int newLen, T value){
+    if (newLen > list.length) {
+      final doFor = newLen - list.length;
+      for (int i = 0; i < doFor; i++) {
+        list.add(value);
+      }
+    } else {
+      list.length = newLen;
+    }
+  }
+
+  /// Resizes the Vec in-place so that len is equal to [newLen].
+  /// If [newLen] is greater than len, the Vec is extended by the difference,
+  /// with each additional slot filled with the result of f. If new_len is less than len,
+  /// the Vec is simply truncated.
+  void resizeWith(int newLen, T Function() f) {
+    if (newLen > list.length) {
+      final doFor = newLen - list.length;
+      for (int i = 0; i < doFor; i++) {
+        list.add(f());
+      }
+    } else {
+      list.length = newLen;
+    }
+  }
+
+  /// Retains only the elements specified by the predicate where the result is true.
+  void retain(bool Function(T) f) {
+    list.retainWhere(f);
+  }
+
+// retain_mut: Will not implement, functionality implemented by `retain`
+// set_len: Will not implement, not possible
+// shrink_to: Will not implement, not possible
+// shrink_to_fit: will not implement, not possible
+// spare_capacity_mut: Will not implement, not possible
+
+  /// Creates a splicing iterator that replaces the specified range in the vector with the given
+  /// [replaceWith] iterator and yields the removed items. replace_with does not need to be the same length as range.
+  RIterator<T> splice(int start, int end, Iterable<T> replaceWith) {
+    final range = list.getRange(start, end).toList(growable: false);
+    list.replaceRange(start, end, replaceWith);
+    return RIterator(range);
+  }
+
+// split_at_spare_mut: Will not implement, not possible
+
+  /// Splits the collection into two at the given index.
+  /// Returns a newly allocated vector containing the elements in the range 
+  /// [at, len). After the call, the original vector will be left containing the elements [0, at).
+  Vec<T> splitOff(int at) {
+    final split = list.sublist(at);
+    list.removeRange(at, list.length);
+    return Vec(split);
+  }
+
+
 // swap_remove
 
   /// Shortens the vector, keeping the first len elements and dropping the rest.

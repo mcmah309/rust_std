@@ -2,7 +2,7 @@ import 'package:rust_std/option.dart';
 import 'package:rust_std/slice.dart';
 import 'package:test/test.dart';
 
-import 'package:rust_std/collections.dart';
+import 'package:rust_std/vec.dart';
 
 main() {
   test("append", () {
@@ -86,12 +86,49 @@ main() {
     expect(vec, [1, 3]);
   });
 
+  test("resize", (){
+    var vec = Vec([1, 2, 3]);
+    vec.resize(5, 4);
+    expect(vec, [1, 2, 3, 4, 4]);
 
+    vec.resize(2, 4);
+    expect(vec, [1, 2]);
+  });
 
+  test("resizeWith", (){
+    var vec = Vec([1, 2, 3]);
+    vec.resizeWith(5, () => 4);
+    expect(vec, [1, 2, 3, 4, 4]);
 
-  // test("Option Vec", () {
-  //   var vec = Vec<Option<int>>([Some(1), None(), Some(3)]);
-  //   var filtered = vec.iter().filter((e) => e.isSome()).map((e) => e.unwrap());
-  //   expect(filtered, [1, 3]);
-  // });
+    vec.resizeWith(2, () => 4);
+    expect(vec, [1, 2]);
+  });
+
+  test("splice", (){
+    var vec = Vec([1, 2, 3, 4]);
+    var spliced = vec.splice(1, 3, [7, 8, 9]).collectVec();
+    expect(vec, [1, 7, 8, 9, 4]);
+    expect(spliced, [2, 3]);
+  });
+
+  test("splitOff", (){
+    var vec = Vec([1, 2, 3, 4]);
+    var split = vec.splitOff(2);
+    expect(vec, [1, 2]);
+    expect(split, [3, 4]);
+  });
+
+  //************************************************************************//
+
+  test("Ensure can use Option in Vec", () {
+    var vec = Vec<Option<int>>([Some(1), None, Some(3)]);
+    var filtered = vec.iter().filter((e) => e.isSome()).map((e) => e.unwrap());
+    expect(filtered, [1, 3]);
+  });
+
+  test("Ensure can use null in Vec", () {
+    var vec = Vec<int?>([1, null, 3]);
+    var filtered = vec.iter().filter((e) => e != null).map((e) => e);
+    expect(filtered, [1, 3]);
+  });
 }
