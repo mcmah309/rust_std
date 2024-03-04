@@ -56,8 +56,17 @@ main() {
 
   test("extendFromWithin", () {
     var vec = Vec([1, 2, 3]);
-    vec.extendFromWithin(0,3);
+    vec.extendFromWithin(0, 3);
     expect(vec, [1, 2, 3, 1, 2, 3]);
+  });
+
+  test("extractIf", (){
+    var vec = Vec([1, 2, 3, 4, 5, 6]);
+    var extracted = vec.extractIf((e) => e % 2 == 0);
+    expect(extracted.take(1), [2]);
+    expect(vec, [1, 3, 4, 5, 6]);
+    expect(extracted.toList(), [4, 6]);
+    expect(vec, [1, 3, 5]);
   });
 
   test("insert", () {
@@ -86,7 +95,7 @@ main() {
     expect(vec, [1, 3]);
   });
 
-  test("resize", (){
+  test("resize", () {
     var vec = Vec([1, 2, 3]);
     vec.resize(5, 4);
     expect(vec, [1, 2, 3, 4, 4]);
@@ -95,7 +104,7 @@ main() {
     expect(vec, [1, 2]);
   });
 
-  test("resizeWith", (){
+  test("resizeWith", () {
     var vec = Vec([1, 2, 3]);
     vec.resizeWith(5, () => 4);
     expect(vec, [1, 2, 3, 4, 4]);
@@ -104,20 +113,38 @@ main() {
     expect(vec, [1, 2]);
   });
 
-  test("splice", (){
+  test("splice", () {
     var vec = Vec([1, 2, 3, 4]);
     var spliced = vec.splice(1, 3, [7, 8, 9]).collectVec();
     expect(vec, [1, 7, 8, 9, 4]);
     expect(spliced, [2, 3]);
   });
 
-  test("splitOff", (){
+  test("splitOff", () {
     var vec = Vec([1, 2, 3, 4]);
     var split = vec.splitOff(2);
     expect(vec, [1, 2]);
     expect(split, [3, 4]);
   });
 
+  test("swapRemove", () {
+    var vec = Vec([1, 2, 3, 4]);
+    vec.swapRemove(1);
+    expect(vec, [1, 4, 3]);
+  });
+
+  // Slice
+  //************************************************************************//
+
+  group("Verify vec slice methods", () {
+    test("swap", () {
+      var vec = Vec([1, 2, 3, 4]);
+      vec.asSlice().swap(1, 3);
+      expect(vec, [1, 4, 3, 2]);
+    });
+  });
+
+  // Validation
   //************************************************************************//
 
   test("Ensure can use Option in Vec", () {

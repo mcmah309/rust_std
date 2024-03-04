@@ -1,10 +1,16 @@
+import 'package:rust_std/prelude.dart';
 import 'package:rust_std/slice.dart';
 import 'package:rust_std/iter.dart';
 import 'package:rust_std/option.dart';
 
 extension type Vec<T>._(List<T> list) {
-
   Vec(this.list);
+
+  Iterator<T> get iterator => list.iterator;
+
+  operator [](int index) => list[index];
+
+  operator []=(int index, T value) => list[index] = value;
 
 // allocator: will not be implemented
 
@@ -82,7 +88,8 @@ extension type Vec<T>._(List<T> list) {
   }
 
   /// Removes the element at the given index from the Vec and returns it.
-  Iterable<T> drain(int start, int end) { //todo change to array
+  Iterable<T> drain(int start, int end) {
+    //todo change to array
     final range = list.getRange(start, end).toList(growable: false);
     list.removeRange(start, end);
     return range;
@@ -98,7 +105,11 @@ extension type Vec<T>._(List<T> list) {
     list.addAll(list.getRange(start, end));
   }
 
-// extract_if: //todo
+  /// Creates an [RIterator] which uses a closure to determine if an element should be removed.
+  /// If the closure returns true, then the element is removed and yielded. If the closure returns false,
+  /// the element will remain in the vector and will not be yielded by the iterator.
+  RIterator<T> extractIf(bool Function(T) f) => RIterator(ExtractIfIterable(this, f));
+
 // from_raw_parts: will not be implemented, not possible
 // from_raw_parts_in: will not be implemented, not possible
 
@@ -145,7 +156,7 @@ extension type Vec<T>._(List<T> list) {
   /// If [newLen] is greater than len, the Vec is extended by the difference,
   /// with each additional slot filled with value. If new_len is less than len,
   /// the Vec is simply truncated.
-  void resize(int newLen, T value){
+  void resize(int newLen, T value) {
     if (newLen > list.length) {
       final doFor = newLen - list.length;
       for (int i = 0; i < doFor; i++) {
@@ -193,7 +204,7 @@ extension type Vec<T>._(List<T> list) {
 // split_at_spare_mut: Will not implement, not possible
 
   /// Splits the collection into two at the given index.
-  /// Returns a newly allocated vector containing the elements in the range 
+  /// Returns a newly allocated vector containing the elements in the range
   /// [at, len). After the call, the original vector will be left containing the elements [0, at).
   Vec<T> splitOff(int at) {
     final split = list.sublist(at);
@@ -201,8 +212,13 @@ extension type Vec<T>._(List<T> list) {
     return Vec(split);
   }
 
-
-// swap_remove
+  /// Removes an element from the vector and returns it.
+  /// The removed element is replaced by the last element of the vector.
+  T swapRemove(int index) {
+    final removed = list[index];
+    list[index] = list.removeLast();
+    return removed;
+  }
 
   /// Shortens the vector, keeping the first len elements and dropping the rest.
   void truncate(int newLen) {
