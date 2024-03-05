@@ -7,7 +7,7 @@ extension VecOnIterableExtension<T> on Iterable<T> {
 }
 
 extension VecOnListExtension<T> on List<T> {
-  Vec<T> toVec(){
+  Vec<T> asVec(){
     return Vec(this);
   }
 }
