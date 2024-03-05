@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'dart:math';
-
 import 'package:path/path.dart' as p;
 import 'package:rust_std/option.dart';
 import 'package:rust_std/iter.dart';
@@ -13,6 +10,7 @@ import 'utils.dart';
 /// An iterator over the entries within a directory.
 typedef ReadDir = List<io.FileSystemEntity>;
 typedef Metadata = io.FileStat;
+const _pathSeparator = "/";
 
 extension type Path._(String path) implements Object {
   static final RegExp regularPathComponent = RegExp(r'^[.\w-]+(\.[\w-]+)*$');
@@ -38,7 +36,7 @@ extension type Path._(String path) implements Object {
   Iterable<Component> components() sync* {
     bool removeLast;
     // trailing slash does not matter
-    if (path.endsWith("/")) {
+    if (path.endsWith(_pathSeparator)) {
       if (path.length == 1) {
         yield RootDir();
         return;
@@ -112,6 +110,9 @@ extension type Path._(String path) implements Object {
   /// The portion of the file name before the second . if the file name begins with .
   Option<String> filePrefix() {
     final value = p.basename(path);
+    if (value.isEmpty) {
+      return None;
+    }
     if (!value.contains(".")) {
       return Some(value);
     }
@@ -142,7 +143,7 @@ extension type Path._(String path) implements Object {
   }
 
   /// Returns true if the Path has a root.
-  bool hasRoot() => unix.rootPrefix(path) == "/";
+  bool hasRoot() => unix.rootPrefix(path) == _pathSeparator;
 
   // into_path_buf : will not be implemented
 
@@ -289,14 +290,14 @@ Path _joinComponents(Iterable<Component> components) {
   final iterator = components.iterator;
   forEachExceptFirstAndLast(iterator, doFirst: (e) {
     if (e is RootDir) {
-      buffer.write("/");
+      buffer.write(_pathSeparator);
     } else {
       buffer.write(e);
-      buffer.write("/");
+      buffer.write(_pathSeparator);
     }
   }, doRest: (e) {
     buffer.write(e);
-    buffer.write("/");
+    buffer.write(_pathSeparator);
   }, doLast: (e) {
     buffer.write(e);
   }, doIfOnlyOne: (e) {
@@ -341,13 +342,13 @@ class RootDir extends Component {
   const RootDir();
 
   @override
-  bool operator ==(Object other) => other == "/" || other is RootDir;
+  bool operator ==(Object other) => other == _pathSeparator || other is RootDir;
 
   @override
-  int get hashCode => "/".hashCode;
+  int get hashCode => _pathSeparator.hashCode;
 
   @override
-  String toString() => "/";
+  String toString() => _pathSeparator;
 }
 
 class CurDir extends Component {

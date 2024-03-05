@@ -12,6 +12,7 @@ void main() {
     expect(Path("foo.tar.gz").filePrefix().unwrap(), "foo");
     expect(Path("temp/foo.tar.gz").filePrefix().unwrap(), "foo");
     expect(Path("/foo/.tmp.bar.tar").filePrefix().unwrap(), "tmp");
+    expect(Path("").filePrefix().isNone(), true);
   });
 
   test("fileStem", () {
@@ -22,6 +23,7 @@ void main() {
     expect(Path("foo").fileStem().unwrap(), "foo");
     expect(Path("foo.tar.gz").fileStem().unwrap(), "foo.tar");
     expect(Path("temp/foo.tar.gz").fileStem().unwrap(), "foo.tar");
+    expect(Path("").fileStem().isNone(), true);
   });
 
   test("parent", () {
@@ -35,6 +37,7 @@ void main() {
     expect(Path("temp/foo.tar.gz").parent().unwrap(), Path("temp"));
     expect(Path("temp1/temp2/foo.tar.gz").parent().unwrap(), Path("temp1/temp2"));
     expect(Path("temp1/temp2//foo.tar.gz").parent().unwrap(), Path("temp1/temp2"));
+    expect(Path("").parent().isNone(), true);
   });
 
   test("ancestors", () {
