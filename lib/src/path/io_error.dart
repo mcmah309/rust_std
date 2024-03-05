@@ -2,7 +2,7 @@ import 'package:rust_std/path.dart';
 
 class IoError implements Exception {
   final IoErrorType type;
-  final Path? path;
+  final String? path;
   final Object? error;
 
   IoError(this.type, {this.path, this.error});

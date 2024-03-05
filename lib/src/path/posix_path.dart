@@ -12,6 +12,8 @@ typedef ReadDir = List<io.FileSystemEntity>;
 typedef Metadata = io.FileStat;
 const _pathSeparator = "/";
 
+/// This type supports a number of operations for inspecting a path, including breaking the path into its components,
+/// extracting the file name, determining whether the path is absolute, and so on.
 extension type Path._(String path) implements Object {
   static final RegExp regularPathComponent = RegExp(r'^[ \\.\w-]+$');
   static final RegExp oneOrmoreSlashes = RegExp('$_pathSeparator+');
