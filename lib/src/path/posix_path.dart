@@ -13,11 +13,11 @@ typedef Metadata = io.FileStat;
 const _pathSeparator = "/";
 
 extension type Path._(String path) implements Object {
-  static final RegExp regularPathComponent = RegExp(r'^[.\w-]+(\.[\w-]+)*$');
-  static final RegExp oneOrmoreSlashes = RegExp(r'/+');
-  static final p.Context unix = p.Context(style: p.Style.posix);
+  static final RegExp regularPathComponent = RegExp(r'^[ \\.\w-]+$');
+  static final RegExp oneOrmoreSlashes = RegExp('$_pathSeparator+');
+  static final p.Context posix = p.Context(style: p.Style.posix);
 
-  Path(this.path) : assert(_validate(path), "Path must be posix style");
+  Path(this.path) : assert(_earlyValidation(path), "Path must be posix style");
 
   Iterable<Path> ancestors() sync* {
     yield this;
@@ -31,7 +31,7 @@ extension type Path._(String path) implements Object {
 // as_mut_os_str : will not be implemented
 // as_os_str : will not be implemented
 
-  Path canonicalize() => Path(unix.canonicalize(path));
+  Path canonicalize() => Path(posix.canonicalize(path));
 
   Iterable<Component> components() sync* {
     bool removeLast;
@@ -96,10 +96,10 @@ extension type Path._(String path) implements Object {
       io.FileSystemEntity.typeSync(path, followLinks: true) != io.FileSystemEntityType.notFound;
 
   /// Extracts the extension (without the leading dot) of self.file_name, if possible.
-  String extension() => unix.extension(path);
+  String extension() => posix.extension(path);
 
   /// Returns the final component of the Path, if there is one.
-  String fileName() => unix.basename(path);
+  String fileName() => posix.basename(path);
 
   /// Extracts the portion of the file name before the first "." -
   ///
@@ -109,7 +109,7 @@ extension type Path._(String path) implements Object {
   /// The entire file name if the file name begins with . and has no other .s within;
   /// The portion of the file name before the second . if the file name begins with .
   Option<String> filePrefix() {
-    final value = p.basename(path);
+    final value = posix.basename(path);
     if (value.isEmpty) {
       return None;
     }
@@ -135,20 +135,20 @@ extension type Path._(String path) implements Object {
   /// The entire file name if the file name begins with . and has no other .s within;
   /// Otherwise, the portion of the file name before the final .
   Option<String> fileStem() {
-    final fileStem = unix.basenameWithoutExtension(path);
-    if(fileStem.isEmpty){
+    final fileStem = posix.basenameWithoutExtension(path);
+    if (fileStem.isEmpty) {
       return None;
     }
     return Some(fileStem);
   }
 
   /// Returns true if the Path has a root.
-  bool hasRoot() => unix.rootPrefix(path) == _pathSeparator;
+  bool hasRoot() => posix.rootPrefix(path) == _pathSeparator;
 
   // into_path_buf : will not be implemented
 
   /// Returns true if the Path is absolute, i.e., if it is independent of the current directory.
-  bool isAbsolute() => unix.isAbsolute(path);
+  bool isAbsolute() => posix.isAbsolute(path);
 
   /// Returns true if the path exists on disk and is pointing at a directory. Does not follow links.
   bool isDir() => io.FileSystemEntity.isDirectorySync(path);
@@ -157,7 +157,7 @@ extension type Path._(String path) implements Object {
   bool isFile() => io.FileSystemEntity.isFileSync(path);
 
   /// Returns true if the Path is relative, i.e., not absolute.
-  bool isRelative() => unix.isRelative(path);
+  bool isRelative() => posix.isRelative(path);
 
   /// Returns true if the path exists on disk and is pointing at a symlink. Does not follow links.
   bool isSymlink() => io.FileSystemEntity.isLinkSync(path);
@@ -166,7 +166,7 @@ extension type Path._(String path) implements Object {
   RIterator<String> iter() => RIterator(components().map((e) => e.toString()));
 
   /// Creates an Path with path adjoined to this.
-  Path join(Path other) => Path(unix.join(path, other.path));
+  Path join(Path other) => Path(posix.join(path, other.path));
 
   /// Queries the file system to get information about a file, directory, etc.
   Metadata metadata() => io.FileStat.statSync(path);
@@ -200,26 +200,26 @@ extension type Path._(String path) implements Object {
   /// Returns an iterator over the entries within a directory.
   Result<ReadDir, IoError> readDir() {
     if (!isDir()) {
-      return Err(IoError(IoErrorType.notADirectory, path: this));
+      return Err(IoError(IoErrorType.notADirectory, path: path));
     }
     try {
       final dir = io.Directory(path);
       return Ok(dir.listSync());
     } catch (e) {
-      return Err(IoError(IoErrorType.unknown, path: this, error: e));
+      return Err(IoError(IoErrorType.unknown, path: path, error: e));
     }
   }
 
   /// Reads a symbolic link, returning the file that the link points to.
   Result<Path, IoError> readLink() {
     if (!isSymlink()) {
-      return Err(IoError(IoErrorType.notAlink, path: this));
+      return Err(IoError(IoErrorType.notAlink, path: path));
     }
     try {
       final link = io.Link(path);
       return Ok(Path(link.resolveSymbolicLinksSync()));
     } catch (e) {
-      return Err(IoError(IoErrorType.unknown, path: this, error: e));
+      return Err(IoError(IoErrorType.unknown, path: path, error: e));
     }
   }
 
@@ -237,12 +237,12 @@ extension type Path._(String path) implements Object {
 
   Result<Metadata, IoError> symlinkMetadata() {
     if (!isSymlink()) {
-      return Err(IoError(IoErrorType.notAlink, path: this));
+      return Err(IoError(IoErrorType.notAlink, path: path));
     }
     try {
       return Ok(io.Link(path).statSync());
     } catch (e) {
-      return Err(IoError(IoErrorType.unknown, path: this, error: e));
+      return Err(IoError(IoErrorType.unknown, path: path, error: e));
     }
   }
 
@@ -310,11 +310,18 @@ Path _joinComponents(Iterable<Component> components) {
 
 //************************************************************************//
 
-bool _validate(String path) {
-  if (path.contains("\\")) {
+// This is likely not complete, but a minimal validation
+bool _earlyValidation(String path) {
+  final hasADoubleDotWithoutSlashes = RegExp(r'[^/]\.\.[^/]');
+  if (hasADoubleDotWithoutSlashes.hasMatch(path)) {
     return false;
   }
-  if (RegExp(r'\.\.[^/]').hasMatch(path)) {
+  final anInvalidComponentHasBeenIdentified = !path
+      .split(_pathSeparator)
+      .skip(1)
+      .where((e) => e.isNotEmpty)
+      .every((e) => Path.regularPathComponent.hasMatch(e));
+  if (anInvalidComponentHasBeenIdentified) {
     return false;
   }
   return true;
