@@ -186,7 +186,7 @@ packages:
     source: hosted
     version: "2.1.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       sha256: "087ce49c3f0dc39180befefc60fdb4acd8f8620e5682fe2476afd0b3688bb4af"
@@ -212,11 +212,12 @@ packages:
   rust_core:
     dependency: "direct main"
     description:
-      name: rust_core
-      sha256: d72e43fd8e095e95c7de98efc367bc617285f2e95cf1038e9b6aa773b68fef70
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.6"
+      path: "."
+      ref: master
+      resolved-ref: "0384b669375a73c792ea8faf984ccc23acdb39e9"
+      url: "https://github.com/mcmah309/rust_core.git"
+    source: git
+    version: "0.4.0"
   shelf:
     dependency: transitive
     description:
@@ -337,6 +338,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.2"
+  universal_io:
+    dependency: "direct main"
+    description:
+      name: universal_io
+      sha256: "1722b2dcc462b4b2f3ee7d188dad008b6eb4c40bbd03a3de451d82c78bba9aad"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
   vm_service:
     dependency: transitive
     description:
@@ -386,4 +395,4 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.2.0 <4.0.0"
+  dart: ">=3.3.0 <4.0.0"
