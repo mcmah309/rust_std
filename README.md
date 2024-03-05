@@ -5,7 +5,7 @@ table of **Rust std** vs **Dart std** types
 |-------------------|-----------------|----------------------|---------------------------------------------------------|
 | `Vec<T>`          | `List<T>`       | `Vec<T>` ✅                    | Dynamic array or list.                                  |
 | `[T]`             | - | `Slice<T>` 🚧                    | View into an array or list.                                  |
-| `[T; N]`          | `const [...]`/`List<T>(growable: false)` | `Array`✅            | Fixed size array or list                                   |
+| `[T; N]`          | `const [...]`/`List<T>(growable: false)` | `Arr`✅            | Fixed size array or list                                   |
 | `Iterator<T>`     | `Iterable<T>`   |  `RIterator<T>` 🚧                  | Composable iteration
 | `HashMap<K, V>`   | `Map<K, V>`     | `HashMap<K, V>` ❌                    | Key-value pairs collection, implemented as a hash table.|
 | `HashSet<T>`      | `Set<T>`        | `HashSet<T>` ❌                    | Unordered collection of unique items.                   |
