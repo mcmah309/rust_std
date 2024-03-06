@@ -8,7 +8,7 @@ extension type Vec<T>._(List<T> list) implements Iterable<T> {
 
   Iterator<T> get iterator => list.iterator;
 
-  operator [](int index) => list[index];
+  T operator [](int index) => list[index];
 
   operator []=(int index, T value) => list[index] = value;
 
