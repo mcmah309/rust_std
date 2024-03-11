@@ -1,6 +1,6 @@
 name: rust_std
 description: The Rust standard library implemented in Dart.
-version: 0.2.0-dev1
+version: 0.2.0
 repository: https://github.com/mcmah309/rust_std
 
 environment:
