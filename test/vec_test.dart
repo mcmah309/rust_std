@@ -60,7 +60,7 @@ main() {
     expect(vec, [1, 2, 3, 1, 2, 3]);
   });
 
-  test("extractIf", (){
+  test("extractIf", () {
     var vec = Vec([1, 2, 3, 4, 5, 6]);
     var extracted = vec.extractIf((e) => e % 2 == 0);
     expect(extracted.take(1), [2]);

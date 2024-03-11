@@ -95,7 +95,8 @@ extension type Path._(String path) implements Object {
 
   /// Determines whether other is a suffix of this.
   bool exists() =>
-      io.FileSystemEntity.typeSync(path, followLinks: true) != io.FileSystemEntityType.notFound;
+      io.FileSystemEntity.typeSync(path, followLinks: true) !=
+      io.FileSystemEntityType.notFound;
 
   /// Extracts the extension (without the leading dot) of self.file_name, if possible.
   String extension() => windows.extension(path);
@@ -165,7 +166,8 @@ extension type Path._(String path) implements Object {
   bool isSymlink() => io.FileSystemEntity.isLinkSync(path);
 
   /// Produces an iterator over the path’s components viewed as Strings
-  RIterator<String> iter() => RIterator.fromIterable(components().map((e) => e.toString()));
+  RIterator<String> iter() =>
+      RIterator.fromIterable(components().map((e) => e.toString()));
 
   /// Creates an Path with path adjoined to this.
   Path join(Path other) => Path(windows.join(path, other.path));
@@ -208,7 +210,7 @@ extension type Path._(String path) implements Object {
       final dir = io.Directory(path);
       return Ok(dir.listSync());
     } catch (e) {
-      return Err(IoErrorUnknown(path,e));
+      return Err(IoErrorUnknown(path, e));
     }
   }
 
@@ -221,7 +223,7 @@ extension type Path._(String path) implements Object {
       final link = io.Link(path);
       return Ok(Path(link.resolveSymbolicLinksSync()));
     } catch (e) {
-      return Err(IoErrorUnknown(path,e));
+      return Err(IoErrorUnknown(path, e));
     }
   }
 
@@ -343,7 +345,8 @@ class Prefix extends Component {
   const Prefix(this.value);
 
   @override
-  bool operator ==(Object other) => other == value || (other is Prefix && other.value == value);
+  bool operator ==(Object other) =>
+      other == value || (other is Prefix && other.value == value);
 
   @override
   int get hashCode => value.hashCode;
@@ -396,7 +399,8 @@ class Normal extends Component {
   Normal(this.value);
 
   @override
-  bool operator ==(Object other) => other == value || (other is Normal && other.value == value);
+  bool operator ==(Object other) =>
+      other == value || (other is Normal && other.value == value);
 
   @override
   int get hashCode => value.hashCode;

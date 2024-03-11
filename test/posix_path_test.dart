@@ -38,8 +38,10 @@ void main() {
     expect(Path("foo").parent().unwrap(), Path(""));
     expect(Path("foo.tar.gz").parent().unwrap(), Path(""));
     expect(Path("temp/foo.tar.gz").parent().unwrap(), Path("temp"));
-    expect(Path("temp1/temp2/foo.tar.gz").parent().unwrap(), Path("temp1/temp2"));
-    expect(Path("temp1/temp2//foo.tar.gz").parent().unwrap(), Path("temp1/temp2"));
+    expect(
+        Path("temp1/temp2/foo.tar.gz").parent().unwrap(), Path("temp1/temp2"));
+    expect(
+        Path("temp1/temp2//foo.tar.gz").parent().unwrap(), Path("temp1/temp2"));
     expect(Path("").parent().isNone(), true);
   });
 
@@ -80,18 +82,20 @@ void main() {
     expect(ancestors.current, Path("foo"));
   });
 
-  test("withExtension",(){
+  test("withExtension", () {
     expect(Path("foo").withExtension("rs"), Path("foo.rs"));
     expect(Path("foo.rs").withExtension("rs"), Path("foo.rs"));
     expect(Path("foo.tar.gz").withExtension("rs"), Path("foo.tar.rs"));
     expect(Path("foo.tar.gz").withExtension(""), Path("foo.tar"));
     expect(Path("foo.tar.gz").withExtension("tar.gz"), Path("foo.tar.tar.gz"));
-    expect(Path("/tmp/foo.tar.gz").withExtension("tar.gz"), Path("/tmp/foo.tar.tar.gz"));
+    expect(Path("/tmp/foo.tar.gz").withExtension("tar.gz"),
+        Path("/tmp/foo.tar.tar.gz"));
     expect(Path("tmp/foo").withExtension("tar.gz"), Path("tmp/foo.tar.gz"));
-    expect(Path("tmp/.foo.tar").withExtension("tar.gz"), Path("tmp/.foo.tar.gz"));
+    expect(
+        Path("tmp/.foo.tar").withExtension("tar.gz"), Path("tmp/.foo.tar.gz"));
   });
 
-  test("withFileName",(){
+  test("withFileName", () {
     expect(Path("foo").withFileName("bar"), Path("bar"));
     expect(Path("foo.rs").withFileName("bar"), Path("bar"));
     expect(Path("foo.tar.gz").withFileName("bar"), Path("bar"));
@@ -102,17 +106,17 @@ void main() {
 
   //************************************************************************//
 
-  test("Option Path",(){
+  test("Option Path", () {
     final optionPath = Path("path").toOption();
-    switch(optionPath){
-      case Some(v:final _):
+    switch (optionPath) {
+      case Some(v: final _):
         break;
       default:
         fail("Should be Some");
     }
     final Option<String> optionString = "string".toOption();
-    switch(optionString){
-      case Some(v:final _):
+    switch (optionString) {
+      case Some(v: final _):
         break;
       default:
         fail("Should be Some");

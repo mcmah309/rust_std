@@ -7,4 +7,3 @@ export 'src/collections/hash_map.dart';
 export 'src/collections/hash_set.dart';
 export 'src/collections/linked_list.dart';
 export 'src/collections/vec_deque.dart';
-
