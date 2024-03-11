@@ -202,26 +202,26 @@ extension type Path._(String path) implements Object {
   /// Returns an iterator over the entries within a directory.
   Result<ReadDir, IoError> readDir() {
     if (!isDir()) {
-      return Err(IoError(IoErrorType.notADirectory, path: path));
+      return Err(IoErrorNotADirectory(path));
     }
     try {
       final dir = io.Directory(path);
       return Ok(dir.listSync());
     } catch (e) {
-      return Err(IoError(IoErrorType.unknown, path: path, error: e));
+      return Err(IoErrorUnknown(path,e));
     }
   }
 
   /// Reads a symbolic link, returning the file that the link points to.
   Result<Path, IoError> readLink() {
     if (!isSymlink()) {
-      return Err(IoError(IoErrorType.notAlink, path: path));
+      return Err(IoErrorNotALink(path));
     }
     try {
       final link = io.Link(path);
       return Ok(Path(link.resolveSymbolicLinksSync()));
     } catch (e) {
-      return Err(IoError(IoErrorType.unknown, path: path, error: e));
+      return Err(IoErrorUnknown(path,e));
     }
   }
 
@@ -239,12 +239,12 @@ extension type Path._(String path) implements Object {
 
   Result<Metadata, IoError> symlinkMetadata() {
     if (!isSymlink()) {
-      return Err(IoError(IoErrorType.notAlink, path: path));
+      return Err(IoErrorNotALink(path));
     }
     try {
       return Ok(io.Link(path).statSync());
     } catch (e) {
-      return Err(IoError(IoErrorType.unknown, path: path, error: e));
+      return Err(IoErrorUnknown(path, e));
     }
   }
 

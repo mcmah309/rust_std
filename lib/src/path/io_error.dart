@@ -1,29 +1,68 @@
-import 'package:rust_std/path.dart';
+sealed class IoError implements Exception {
+  final String path;
 
-class IoError implements Exception {
-  final IoErrorType type;
-  final String? path;
-  final Object? error;
-
-  IoError(this.type, {this.path, this.error});
+  const IoError(this.path);
 
   @override
   String toString() {
-    final additional = "${path != null ? "\nPath: '$path'": ""}${error != null ? "\nError: '$error'" : ""}";
-    return switch(type){
-      IoErrorType.notADirectory => "The path is not a directory.$additional",
-      IoErrorType.notAFile => "The path is not a file.$additional",
-      IoErrorType.notAlink => "The path is not a link.$additional",
-      IoErrorType.notAValidPath => "The path is not a valid path.$additional",
-      IoErrorType.unknown => "An unknown error occurred.$additional",
-    };
+    return "IoError";
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == runtimeType;
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+final class IoErrorNotADirectory extends IoError {
+  const IoErrorNotADirectory(super.path);
+
+  @override
+  String toString() {
+    return "IoError: The path '$path' is not a directory.";
   }
 }
 
-enum IoErrorType {
-  notADirectory,
-  notAFile,
-  notAlink,
-  notAValidPath,
-  unknown,
+final class IoErrorNotAFile extends IoError {
+  const IoErrorNotAFile(super.path);
+
+  @override
+  String toString() {
+    return "IoError: The path '$path' is not a file.";
+  }
+}
+
+final class IoErrorNotALink extends IoError {
+  const IoErrorNotALink(super.path);
+
+  @override
+  String toString() {
+    return "IoError: The path '$path' is not a link.";
+  }
+}
+
+final class IoErrorNotAValidPath extends IoError {
+  const IoErrorNotAValidPath(super.path);
+
+  @override
+  String toString() {
+    return "IoError: The path '$path' is not a valid path.";
+  }
+}
+
+final class IoErrorUnknown extends IoError {
+  final Object? error;
+
+  const IoErrorUnknown(super.path, [this.error]);
+
+  @override
+  String toString() {
+    if (error != null) {
+      return "IoError: An unknown error occurred with path '$path'. Error: $error";
+    }
+    return "IoError: An unknown error occurred with path '$path'.";
+  }
 }

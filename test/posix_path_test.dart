@@ -1,3 +1,5 @@
+// ignore_for_file: pattern_never_matches_value_type
+
 import 'package:rust_std/option.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
@@ -103,14 +105,14 @@ void main() {
   test("Option Path",(){
     final optionPath = Path("path").toOption();
     switch(optionPath){
-      case Some(:final v):
+      case Some(v:final _):
         break;
       default:
         fail("Should be Some");
     }
     final Option<String> optionString = "string".toOption();
     switch(optionString){
-      case Some(:final v):
+      case Some(v:final _):
         break;
       default:
         fail("Should be Some");
