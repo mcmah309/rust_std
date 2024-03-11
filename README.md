@@ -1,4 +1,6 @@
-The rust standard library implemented in Dart where it makes sense. Built on top of [rust_core](https://github.com/mcmah309/rust_core).
+# rust_std
+
+The Rust standard library implemented in Dart. Built on top of [rust_core](https://github.com/mcmah309/rust_core).
 
 Implemented ✅:
 | Rust Type         | Dart Equivalent | rust_std Implementation | Description                                             |
