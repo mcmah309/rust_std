@@ -7,6 +7,7 @@
 /// which are used in almost every single rust_std program.
 library prelude;
 
+export 'array.dart';
 export 'vec.dart';
 export 'iter.dart';
 export 'option.dart';
