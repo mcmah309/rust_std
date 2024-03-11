@@ -1,8 +1,18 @@
 import 'package:rust_std/vec.dart';
 
 extension VecOnIterableExtension<T> on Iterable<T> {
-  Vec<T> collectVec(){
+  Vec<T> toVec(){
     return Vec(toList());
+  }
+}
+
+extension VecOnIteratorExtension<T> on Iterator<T> {
+  Vec<T> collectVec(){
+    final list = <T>[];
+    while(moveNext()){
+      list.add(current);
+    }
+    return Vec(list);
   }
 }
 

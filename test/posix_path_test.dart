@@ -1,3 +1,4 @@
+import 'package:rust_std/option.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 import 'package:rust_std/posix_path.dart';
@@ -97,5 +98,22 @@ void main() {
     expect(Path("/var").withFileName("bar"), Path("/bar"));
   });
 
+  //************************************************************************//
 
+  test("Option Path",(){
+    final optionPath = Path("path").toOption();
+    switch(optionPath){
+      case Some(:final v):
+        break;
+      default:
+        fail("Should be Some");
+    }
+    final Option<String> optionString = "string".toOption();
+    switch(optionString){
+      case Some(:final v):
+        break;
+      default:
+        fail("Should be Some");
+    }
+  });
 }

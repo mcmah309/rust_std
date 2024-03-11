@@ -165,7 +165,7 @@ extension type Path._(String path) implements Object {
   bool isSymlink() => io.FileSystemEntity.isLinkSync(path);
 
   /// Produces an iterator over the path’s components viewed as Strings
-  RIterator<String> iter() => RIterator(components().map((e) => e.toString()));
+  RIterator<String> iter() => RIterator.fromIterable(components().map((e) => e.toString()));
 
   /// Creates an Path with path adjoined to this.
   Path join(Path other) => Path(posix.join(path, other.path));

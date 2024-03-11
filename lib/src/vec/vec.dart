@@ -106,7 +106,7 @@ extension type Vec<T>._(List<T> list) implements Iterable<T> {
   /// Creates an [RIterator] which uses a closure to determine if an element should be removed.
   /// If the closure returns true, then the element is removed and yielded. If the closure returns false,
   /// the element will remain in the vector and will not be yielded by the iterator.
-  RIterator<T> extractIf(bool Function(T) f) => RIterator(ExtractIfIterable(this, f));
+  RIterator<T> extractIf(bool Function(T) f) => RIterator.fromIterable(ExtractIfIterable(this, f));
 
 // from_raw_parts: will not be implemented, not possible
 // from_raw_parts_in: will not be implemented, not possible
@@ -230,7 +230,7 @@ extension type Vec<T>._(List<T> list) implements Iterable<T> {
 
   //************************************************************************//
 
-  RIterator<T> iter() => RIterator(list);
+  RIterator<T> iter() => RIterator.fromIterable(list);
 
   // Iterable: Overriding iterable methods
   //************************************************************************//
@@ -281,7 +281,7 @@ extension type Vec<T>._(List<T> list) implements Iterable<T> {
   //   return list.any(f);
   // }
 
-  RIterator<U> cast<U>() => RIterator(list.cast<U>());
+  RIterator<U> cast<U>() => RIterator.fromIterable(list.cast<U>());
 
   // bool contains(Object? element) => list.contains(element);
 
@@ -289,13 +289,13 @@ extension type Vec<T>._(List<T> list) implements Iterable<T> {
 
   // bool every(bool Function(T) f) => list.every(f);
 
-    RIterator<U> expand<U>(Iterable<U> Function(T) f) => RIterator(list.expand(f));
+    RIterator<U> expand<U>(Iterable<U> Function(T) f) => RIterator.fromIterable(list.expand(f));
 
   // T firstWhere(bool Function(T) f, {T Function()? orElse}) => list.firstWhere(f, orElse: orElse);
 
   // U fold<U>(U initialValue, U Function(U previousValue, T element) f) => list.fold(initialValue, f);
 
-  RIterator<T> followedBy(Iterable<T> other) => RIterator(list.followedBy(other));
+  RIterator<T> followedBy(Iterable<T> other) => RIterator.fromIterable(list.followedBy(other));
 
   // void forEach(void Function(T) f) => list.forEach(f);
 
@@ -303,19 +303,19 @@ extension type Vec<T>._(List<T> list) implements Iterable<T> {
 
   // T lastWhere(bool Function(T) f, {T Function()? orElse}) => list.lastWhere(f, orElse: orElse);
 
-  // RIterator<U> map<U>(U Function(T) f) => RIterator(list.map(f));
+  RIterator<U> map<U>(U Function(T) f) => RIterator.fromIterable(list.map(f));
 
   // T reduce(T Function(T, T) f) => list.reduce(f);
 
   // T singleWhere(bool Function(T) f, {T Function()? orElse}) => list.singleWhere(f, orElse: orElse);
 
-  RIterator<T> skip(int count) => RIterator(list.skip(count));
+  RIterator<T> skip(int count) => RIterator.fromIterable(list.skip(count));
 
-  RIterator<T> skipWhile(bool Function(T) f) => RIterator(list.skipWhile(f));
+  RIterator<T> skipWhile(bool Function(T) f) => RIterator.fromIterable(list.skipWhile(f));
 
-  RIterator<T> take(int count) => RIterator(list.take(count));
+  RIterator<T> take(int count) => RIterator.fromIterable(list.take(count));
 
-  RIterator<T> takeWhile(bool Function(T) f) => RIterator(list.takeWhile(f));
+  RIterator<T> takeWhile(bool Function(T) f) => RIterator.fromIterable(list.takeWhile(f));
 
   // List<T> toList({bool growable = true}) => list.toList(growable: growable);
 
@@ -323,7 +323,7 @@ extension type Vec<T>._(List<T> list) implements Iterable<T> {
 
   // String toString() => list.toString();
 
-  RIterator<T> where(bool Function(T) f) => RIterator(list.where(f));
+  RIterator<T> where(bool Function(T) f) => RIterator.fromIterable(list.where(f));
 
-  RIterator<U> whereType<U>() => RIterator(list.whereType<U>());
+  RIterator<U> whereType<U>() => RIterator.fromIterable(list.whereType<U>());
 }
