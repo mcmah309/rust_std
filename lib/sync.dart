@@ -1,3 +1,3 @@
 library sync;
 
-export 'src/sync/mpsc.dart';
+export 'package:rust_core/sync.dart';

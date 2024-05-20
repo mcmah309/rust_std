@@ -8,9 +8,11 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  rust_core: ^0.5.0
   path: ^1.9.0
   universal_io: ^2.2.2
+  rust_core:
+  vec:
+  path_type:
 
 dev_dependencies:
   lints: ^2.1.0
