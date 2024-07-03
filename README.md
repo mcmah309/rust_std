@@ -6,6 +6,7 @@
 [![Build Status](https://github.com/mcmah309/rust_std/actions/workflows/dart.yml/badge.svg)](https://github.com/mcmah309/rust_std/actions)
 
 rust_std is an umbrella package that re-exports packages that form the basis of the Rust standard library in Dart:
-    - [rust_core](https://github.com/mcmah309/rust_core)
-    - [path_type](https://github.com/mcmah309/path_type)
-    - [vec](https://github.com/mcmah309/vec)
+
+- [rust_core](https://github.com/mcmah309/rust_core)
+- [path_type](https://github.com/mcmah309/path_type)
+- [vec](https://github.com/mcmah309/vec)
