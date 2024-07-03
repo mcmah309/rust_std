@@ -8,7 +8,7 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  rust_core:
+  rust_core: ^1.0.0
   vec:
   path_type:
 

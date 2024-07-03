@@ -197,10 +197,10 @@ packages:
     dependency: "direct main"
     description:
       name: path_type
-      sha256: "0c8547909efcd03f92a60317dabaf4a2091a10998f032e34468782350d96e8f3"
+      sha256: "3ab00161ed5f7de8813af1be986d108b0e4b58cd7b44085a0c9f5d8bc3089260"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.0"
+    version: "0.3.0"
   pool:
     dependency: transitive
     description:
@@ -221,10 +221,10 @@ packages:
     dependency: "direct main"
     description:
       name: rust_core
-      sha256: "79585b216ed412b1f5bd4b497ef19d91326fd61778a531eacfb0ae1122ed609c"
+      sha256: "6e99e3435ade946f935829bb7dad221fe239bfc39758f0cbaeba0a6054793316"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.4"
+    version: "1.0.0"
   shelf:
     dependency: transitive
     description:
@@ -345,22 +345,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.2"
-  universal_io:
-    dependency: transitive
-    description:
-      name: universal_io
-      sha256: "1722b2dcc462b4b2f3ee7d188dad008b6eb4c40bbd03a3de451d82c78bba9aad"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.2"
   vec:
     dependency: "direct main"
     description:
       name: vec
-      sha256: "103c3480c6b3e70efaa6e4cbece03045a93208bd1459af948e7a354f954ddb35"
+      sha256: "49ee4eec0f8720af3965ed370c3119dd4914baf30c250416c2c20bb383d0ba33"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.0"
+    version: "0.2.2"
   vm_service:
     dependency: transitive
     description:

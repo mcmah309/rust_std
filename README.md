@@ -5,4 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/mcmah309/rust_std/actions/workflows/dart.yml/badge.svg)](https://github.com/mcmah309/rust_std/actions)
 
-The Rust standard library implemented in Dart. Built on top of [rust_core](https://github.com/mcmah309/rust_core).
+rust_std is an umbrella package that re-exports packages that form the basis of the Rust standard library in Dart:
+    - [rust_core](https://github.com/mcmah309/rust_core)
+    - [path_type](https://github.com/mcmah309/path_type)
+    - [vec](https://github.com/mcmah309/vec)
