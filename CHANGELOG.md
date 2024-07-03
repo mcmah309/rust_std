@@ -1,3 +1,7 @@
+## 0.3.0
+
+- Update `rust_core` to `1.0.0`
+
 ## 0.2.1
 
 - Move `Vec` and `Path` to there own packages
